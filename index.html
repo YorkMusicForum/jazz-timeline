@@ -91,6 +91,95 @@
   <footer>
     &copy; York Music Forum
   </footer>
+You said:
+do that
 
+
+ChatGPT said:
+Perfect! Here’s exactly what to do for Step 2 — adding the JavaScript to your index.html so the decade buttons load and show your timeline data.
+
+Step 2: Add this JavaScript just before the closing </body> tag in your index.html:
+html
+Copy code
+<script>
+  // Fetch CSV file and parse it into an array of objects
+  async function fetchCSV(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch ' + url);
+    }
+    const text = await response.text();
+    return parseCSV(text);
+  }
+
+  // Basic CSV parser: assumes first line is headers, comma separated
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.trim());
+      let obj = {};
+      headers.forEach((header, i) => obj[header] = values[i]);
+      return obj;
+    });
+  }
+
+  // Display timeline events in the timeline section
+  function displayTimeline(events) {
+    const timelineDiv = document.getElementById('timeline');
+    timelineDiv.innerHTML = '';  // Clear previous events
+
+    if (events.length === 0) {
+      timelineDiv.innerHTML = '<p>No events found for this decade.</p>';
+      return;
+    }
+
+    events.forEach(event => {
+      const eventDiv = document.createElement('div');
+      eventDiv.style.marginBottom = '1.5rem';
+
+      eventDiv.innerHTML = `
+        <h3 style="color:#8b1453; margin-bottom:0.2rem;">
+          ${event.Year}: ${event.Event}
+        </h3>
+        <p>${event.Description}</p>
+        ${event.SpotifyLink ? `<p><a href="${event.SpotifyLink}" target="_blank" rel="noopener noreferrer">Listen on Spotify</a></p>` : ''}
+      `;
+      timelineDiv.appendChild(eventDiv);
+    });
+  }
+
+  // Update the era image for the selected decade
+  function updateEraImage(decade) {
+    const eraImage = document.getElementById('era-image');
+    eraImage.src = `images/${decade}.jpg`;
+    eraImage.alt = `Jazz era: ${decade}`;
+  }
+
+  // Load decade data and update page
+  async function loadDecade(decade) {
+    try {
+      const events = await fetchCSV(`data/${decade}.csv`);
+      displayTimeline(events);
+      updateEraImage(decade);
+    } catch (error) {
+      const timelineDiv = document.getElementById('timeline');
+      timelineDiv.innerHTML = `<p style="color:red;">Error loading data: ${error.message}</p>`;
+    }
+  }
+
+  // Add click event listeners to decade buttons
+  document.getElementById('decade-buttons').addEventListener('click', (event) => {
+    if (event.target.tagName === 'BUTTON') {
+      const decade = event.target.getAttribute('data-decade');
+      loadDecade(decade);
+    }
+  });
+
+  // Load the first decade automatically on page load
+  window.addEventListener('load', () => {
+    loadDecade('1900-1910');
+  });
+</script>
 </body>
 </html>
