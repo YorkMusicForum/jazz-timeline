@@ -3,214 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jazz History Timeline | York Music Forum</title>
+  <title>History of Jazz Timeline</title>
+  <link href="https://fonts.googleapis.com/css2?family=Abeezee&family=Muli&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
-      font-family: 'Muli', sans-serif;
       background: white;
       color: black;
+      font-family: 'Muli', sans-serif;
       margin: 2rem;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
     }
-    h1, h2, h3 {
+    h1 {
       font-family: 'Abeezee', serif;
       color: #8b1453;
-      margin-bottom: 0.3rem;
+      font-size: 3rem;
+      margin-bottom: 0.2rem;
     }
-    #era-image {
+    #logo {
+      width: 100px; /* half size */
       display: block;
-      margin: 1rem auto;
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    #decade-buttons {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    #decade-buttons button {
-      background: #8b1453;
-      border: none;
-      color: white;
-      font-family: 'Abeezee', serif;
-      font-size: 1rem;
-      margin: 0 0.3rem 0.6rem 0.3rem;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    #decade-buttons button:hover,
-    #decade-buttons button:focus {
-      background-color: #5e0d36;
-      outline: none;
-    }
-    #timeline div {
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 1rem;
       margin-bottom: 1rem;
     }
-    #timeline a {
-      color: #8b1453;
-      text-decoration: none;
+    #decade-buttons {
+      margin-bottom: 2rem;
     }
-    #timeline a:hover {
-      text-decoration: underline;
-    }
-    .donate-button {
+    button.decade-button {
       background-color: #8b1453;
       color: white;
-      font-family: 'Abeezee', serif;
-      font-size: 1.2rem;
-      padding: 0.8rem 2rem;
       border: none;
-      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      margin: 0.2rem;
       cursor: pointer;
-      display: block;
-      margin: 2rem auto 1rem auto;
+      font-family: 'Abeezee', serif;
+      font-size: 1rem;
+      border-radius: 4px;
       transition: background-color 0.3s ease;
-      text-align: center;
-      max-width: 200px;
     }
-    .donate-button:hover,
-    .donate-button:focus {
-      background-color: #5e0d36;
-      outline: none;
+    button.decade-button:hover,
+    button.decade-button.active {
+      background-color: #5e0e37;
+    }
+    #timeline h3 {
+      color: #8b1453;
+      font-family: 'Abeezee', serif;
+      margin-bottom: 0.1rem;
+    }
+    #timeline em {
+      color: #555;
+    }
+    #timeline p {
+      margin-top: 0.1rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    .donate-button {
+      display: inline-block;
+      margin-top: 2rem;
+      background-color: #8b1453;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      font-family: 'Abeezee', serif;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .donate-button:hover {
+      background-color: #5e0e37;
     }
   </style>
 </head>
 <body>
 
-  <!-- Logo -->
-  <img src="images/ymf-logo.png" alt="York Music Forum Logo" style="display:block; margin: 0 auto 1.5rem auto; max-width: 250px;" />
+  <img id="logo" src="images/ymf-logo.png" alt="York Music Forum Logo" />
+  <h1>History of Jazz Timeline</h1>
 
-  <h1>Jazz History Timeline</h1>
+  <div id="decade-buttons"></div>
 
-  <!-- Era Image -->
-  <img id="era-image" src="images/1900 Jelly Roll Morton.jpg" alt="Jazz era" />
-
-  <!-- Timeline Display -->
-  <section id="timeline"></section>
-
-  <!-- Decade Selection Buttons -->
-  <div id="decade-buttons">
-    <button data-decade="1900_1910">1900-1910</button>
-    <button data-decade="1910_1920">1910-1920</button>
-    <button data-decade="1920_1930">1920-1930</button>
-    <button data-decade="1930_1940">1930-1940</button>
-    <button data-decade="1940_1950">1940-1950</button>
-    <button data-decade="1950_1960">1950-1960</button>
-    <button data-decade="1960_1970">1960-1970</button>
-    <button data-decade="1970_1980">1970-1980</button>
-    <button data-decade="1980_1990">1980-1990</button>
-    <button data-decade="1990_2000">1990-2000</button>
-    <button data-decade="2000_2010">2000-2010</button>
-    <button data-decade="2010_2020">2010-2020</button>
-    <button data-decade="2020_2030">2020-2030</button>
+  <div id="timeline">
+    <p>Select a decade above to view important jazz events.</p>
   </div>
 
-  <!-- Donate Button -->
-  <button class="donate-button" onclick="window.open('https://your-donate-link.com', '_blank')">Donate to YMF</button>
+  <a href="https://buy.stripe.com/5kA2aJ0bCgHFfC05km" class="donate-button" target="_blank" rel="noopener noreferrer">Donate to York Music Forum</a>
 
   <script>
-    // Map decade keys to era image filenames exactly as provided
-    const eraImages = {
-      "1900_1910": "1900 Jelly Roll Morton.jpg",
-      "1910_1920": "1910 WC Handy.jpg",
-      "1920_1930": "1920 Louis Armstrong.jpg",
-      "1930_1940": "1930 Billie Holiday.jpg",
-      "1940_1950": "1940 Charlie Parker.jpg",
-      "1950_1960": "1950 John Coltrane.jpg",
-      "1960_1970": "1960 Miles Davis.jfif",
-      "1970_1980": "1970 Weather Report.jpg",
-      "1980_1990": "1980 Wynton Marsalis.jpg",
-      "1990_2000": "1990 Diana Krall.jpeg",
-      "2000_2010": "2000 Robert Glasper.jpg",
-      "2010_2020": "2010 Esperanza Spalding.jpg",
-      "2020_2030": "2020 Kamzi Washington.jpg"
-    };
+    // Decade ranges to match your CSV files
+    const decades = [
+      "1900_1910",
+      "1910_1920",
+      "1920_1930",
+      "1930_1940",
+      "1940_1950",
+      "1950_1960",
+      "1960_1970",
+      "1970_1980",
+      "1980_1990",
+      "1990_2000",
+      "2000_2010",
+      "2010_2020",
+      "2020_2030"
+    ];
+
+    const buttonsContainer = document.getElementById('decade-buttons');
+    const timelineDiv = document.getElementById('timeline');
+
+    // Create buttons dynamically
+    decades.forEach(decade => {
+      const btn = document.createElement('button');
+      btn.className = 'decade-button';
+      // Format display text like "1900 - 1910"
+      const displayText = decade.replace('_', ' - ');
+      btn.textContent = displayText;
+      btn.dataset.decade = decade;
+      btn.addEventListener('click', () => {
+        // Highlight active button
+        document.querySelectorAll('.decade-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadDecade(decade);
+      });
+      buttonsContainer.appendChild(btn);
+    });
 
     async function fetchCSV(url) {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch ' + url);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const text = await response.text();
+        return new Promise((resolve, reject) => {
+          Papa.parse(text, {
+            header: true,
+            skipEmptyLines: true,
+            complete: results => resolve(results.data),
+            error: err => reject(err)
+          });
+        });
+      } catch (error) {
+        console.error('Fetch CSV error:', error);
+        return [];
       }
-      const text = await response.text();
-      return parseCSV(text);
     }
 
-    function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      return lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim());
-        let obj = {};
-        headers.forEach((header, i) => obj[header] = values[i]);
-        return obj;
-      });
-    }
-
-    function displayTimeline(events) {
-      const timelineDiv = document.getElementById('timeline');
-      timelineDiv.innerHTML = '';
+    async function loadDecade(decade) {
+      timelineDiv.innerHTML = '<p>Loading...</p>';
+      const csvPath = `data/jazz_timeline_${decade}.csv`;
+      const events = await fetchCSV(csvPath);
 
       if (events.length === 0) {
         timelineDiv.innerHTML = '<p>No events found for this decade.</p>';
         return;
       }
 
+      // Sort events by Year (numerically)
+      events.sort((a, b) => Number(a.Year) - Number(b.Year));
+
+      displayTimeline(events);
+    }
+
+    function displayTimeline(events) {
+      timelineDiv.innerHTML = '';
+
       events.forEach(event => {
         const eventDiv = document.createElement('div');
         eventDiv.style.marginBottom = '1.5rem';
 
         eventDiv.innerHTML = `
-          <h3>${event.Year}: ${event.Event}</h3>
+          <h3>${event.Year}: ${event.Title}</h3>
+          <p><em>${event.Type}</em></p>
           <p>${event.Description}</p>
-          ${event.SpotifyLink ? `<p><a href="${event.SpotifyLink}" target="_blank" rel="noopener noreferrer">Listen on Spotify</a></p>` : ''}
         `;
+
         timelineDiv.appendChild(eventDiv);
       });
     }
 
-    function updateEraImage(decadeKey) {
-      const eraImage = document.getElementById('era-image');
-      const filename = eraImages[decadeKey];
-      if (filename) {
-        eraImage.src = `images/${filename}`;
-        eraImage.alt = `Jazz era: ${filename}`;
-      } else {
-        eraImage.src = '';
-        eraImage.alt = 'Jazz era image not found';
-      }
-    }
-
-    async function loadDecade(decadeKey) {
-      try {
-        // Compose CSV filename as per your naming convention:
-        const csvFilename = `data/jazz_timeline_${decadeKey}.csv`;
-        const events = await fetchCSV(csvFilename);
-        displayTimeline(events);
-        updateEraImage(decadeKey);
-      } catch (error) {
-        const timelineDiv = document.getElementById('timeline');
-        timelineDiv.innerHTML = `<p style="color:red;">Error loading data: ${error.message}</p>`;
-      }
-    }
-
-    // Set up button click listeners
-    document.getElementById('decade-buttons').addEventListener('click', (e) => {
-      if (e.target.tagName === 'BUTTON') {
-        loadDecade(e.target.getAttribute('data-decade'));
-      }
-    });
-
-    // Load the first decade on page load
-    window.addEventListener('load', () => {
-      loadDecade('1900_1910');
-    });
+    // Optionally auto-load the first decade on page load:
+    document.querySelector('.decade-button').click();
   </script>
+
 </body>
 </html>
