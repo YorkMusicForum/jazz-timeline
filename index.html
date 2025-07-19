@@ -167,7 +167,7 @@
     // Load decade data and update page
     async function loadDecade(decade) {
       try {
-        const events = await fetchCSV(`data/${decade}.csv`);
+        const events = await fetchCSV(`data/jazz_timeline_${decade.replace('-', '_')}.csv`);
         displayTimeline(events);
         updateEraImage(decade);
       } catch (error) {
