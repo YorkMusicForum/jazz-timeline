@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The History of Jazz Timeline</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background-color: white;
       color: black;
       margin: 0;
       padding: 0;
+      word-wrap: break-word;
     }
 
     header {
@@ -75,9 +80,11 @@
     }
 
     .event {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       border-bottom: 1px solid #ccc;
       padding-bottom: 0.5rem;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
 
     .event h3 {
@@ -89,7 +96,8 @@
     .event p {
       margin: 0.3rem 0 0;
       font-size: 0.95rem;
-      line-height: 1.4;
+      line-height: 1.5;
+      white-space: normal;
     }
 
     @media (max-width: 600px) {
@@ -116,7 +124,7 @@
   <header>
     <img src="images/ymf-logo.png" alt="York Music Forum Logo" />
     <h1>The History of Jazz Timeline</h1>
-    <a href="https://buy.stripe.com/5kA2aJ0bCgHFfC05km" class="donate-button" target="_blank">Donate to YMF</a>
+    <a href="https://buy.stripe.com/5kA2aJ0bCgHFfC05km" class="donate-button" target="_blank" rel="noopener noreferrer">Donate to YMF</a>
   </header>
 
   <div class="buttons" id="decade-buttons">
@@ -144,13 +152,21 @@
 
       try {
         const response = await fetch(`data/jazz_timeline_${decade}.csv`);
+        if (!response.ok) throw new Error('File not found');
         const text = await response.text();
 
         const rows = text.trim().split('\n').slice(1); // skip header
         const events = rows.map(row => {
-          const [year, title, description, type] = row.split(',');
-          return { year: year.trim(), title: title.trim(), description: description.trim(), type: type.trim() };
+          // handle CSV with commas inside quotes by using a CSV parser or a simple workaround:
+          // but here we'll do a simple split and trim for now assuming no commas inside fields
+          const [year, title, description, type] = row.split(',').map(s => s.trim());
+          return { year, title, description, type };
         });
+
+        if (events.length === 0) {
+          timeline.innerHTML = '<p>No events found for this decade.</p>';
+          return;
+        }
 
         timeline.innerHTML = events.map(event => `
           <div class="event">
