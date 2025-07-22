@@ -2,99 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Jazz Timeline</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jazz History Timeline</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: white;
+      color: #000;
       margin: 0;
       padding: 0;
-      background: #fff;
-      color: #000;
     }
 
     header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 1rem;
-      background: #fff;
       border-bottom: 2px solid #eee;
     }
 
-    header img {
+    #logo {
       height: 60px;
-      margin-bottom: 0.5rem;
-    }
-
-    h1 {
-      color: #8b1453;
-      margin: 0.2rem 0;
     }
 
     .donate-button {
       background-color: #8b1453;
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 5px;
+      padding: 0.5rem 1rem;
       font-size: 1rem;
+      border-radius: 5px;
       cursor: pointer;
       text-decoration: none;
-      display: inline-block;
-      margin-top: 0.5rem;
     }
 
-    .buttons {
+    h1 {
+      text-align: center;
+      color: #8b1453;
+      font-size: 2rem;
+      margin: 1rem 0 0.5rem;
+    }
+
+    #decade-buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      margin: 1rem 0;
       gap: 0.5rem;
+      padding: 1rem;
     }
 
-    .buttons button {
+    #decade-buttons button {
       background-color: #8b1453;
       color: white;
       border: none;
       padding: 0.5rem 1rem;
-      border-radius: 4px;
+      border-radius: 20px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 1rem;
     }
 
-    .timeline {
-      padding: 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    #timeline {
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
+      padding: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .card {
-      background-color: #f9f9f9;
-      border-left: 4px solid #8b1453;
+      border: 1px solid #ddd;
+      border-radius: 10px;
       padding: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      background-color: #fff;
     }
 
     .card h3 {
-      margin: 0;
+      margin-top: 0;
       color: #8b1453;
     }
 
     .card p {
-      margin: 0.3rem 0;
+      margin: 0.5rem 0;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      #logo {
+        height: 50px;
+      }
+      .donate-button {
+        margin-top: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="images/ymf-logo.png" alt="York Music Forum Logo">
-    <h1>Jazz Timeline</h1>
-    <a class="donate-button" href="https://buy.stripe.com/5kA2aJ0bCgHFfC05km" target="_blank">Donate to YMF</a>
+    <img src="images/ymf-logo.png" alt="YMF Logo" id="logo">
+    <a class="donate-button" href="https://buy.stripe.com/5kA2aJ0bCgHFfC05km" target="_blank">Donate</a>
   </header>
 
-  <div class="buttons" id="decade-buttons"></div>
-  <div class="timeline" id="timeline"></div>
+  <h1>Jazz History Timeline</h1>
+  <div id="decade-buttons"></div>
+  <div id="timeline"></div>
 
   <script>
     const decades = [
@@ -113,14 +128,32 @@
       buttonsContainer.appendChild(button);
     });
 
+    function parseCSV(csvText) {
+      const rows = [];
+      const lines = csvText.split(/\r?\n/);
+      for (const line of lines.slice(1)) {
+        const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        if (matches && matches.length >= 4) {
+          const [year, title, description, type] = matches.map(cell =>
+            cell.replace(/^"(.*)"$/, '$1').replace(/""/g, '"')
+          );
+          rows.push({ year, title, description, type });
+        }
+      }
+      return rows;
+    }
+
     async function loadDecade(decade) {
       timelineContainer.innerHTML = '';
       try {
         const response = await fetch(`data/jazz_timeline_${decade}.csv`);
         const text = await response.text();
-        const rows = text.trim().split('\n').slice(1);
-        rows.forEach(row => {
-          const [year, title, description, type] = row.split('\t');
+        const entries = parseCSV(text);
+        if (!entries.length) {
+          timelineContainer.innerHTML = '<p>No data found for this decade.</p>';
+          return;
+        }
+        entries.forEach(({ year, title, description, type }) => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
